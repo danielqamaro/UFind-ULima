@@ -26,7 +26,7 @@ class ProximamenteScreen extends StatelessWidget {
               Card(child: Padding(padding: const EdgeInsets.all(18), child: Column(children: const [
                 Icon(Icons.construction_outlined, size: 35),
                 SizedBox(height: 8),
-                Text('Esta sección se habilitará al fusionar el Pull Request del integrante responsable.', textAlign: TextAlign.center),
+                Text('Proximamente tendras mas funciones disponibles', textAlign: TextAlign.center),
               ]))),
               const SizedBox(height: 16),
               OutlinedButton.icon(
