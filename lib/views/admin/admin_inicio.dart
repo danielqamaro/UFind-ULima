@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ufind/views/admin/formulario_publicacion.dart';
 import 'package:ufind/views/admin/gestion_publicaciones.dart';
+import 'package:ufind/views/admin/gestion_solicitudes.dart';
 
 
 import 'package:ufind/app/app_dependencies.dart';
@@ -181,7 +182,7 @@ class AdminInicio extends StatelessWidget {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const ProximamenteScreen(titulo: 'Solicitudes administrativas', descripcion: 'Esta sección estará disponible próximamente.'),
+                      builder: (_) => GestionSolicitudesScreen(dependencias: dependencias),
                     ),
                   ),
                 ),

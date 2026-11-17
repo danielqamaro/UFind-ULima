@@ -12,9 +12,101 @@ class DetalleObjetoScreen extends StatelessWidget {
   const DetalleObjetoScreen({super.key, required this.objeto, required this.dependencias});
 
   Future<void> _solicitar(BuildContext context) async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Próximamente podrás solicitar la recuperación de este objeto.')),
-    );
+    final scope = dependencias;
+    final correo = scope.sesion.correo;
+    if (correo == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ingresa como estudiante para solicitar el objeto.'),
+        ),
+      );
+      return;
+    }
+    if (scope.solicitudes.tienePendiente(objeto.id, correo)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ya tienes una solicitud pendiente para este objeto.'),
+        ),
+      );
+      return;
+    }
+    final form = GlobalKey<FormState>();
+    final prueba = TextEditingController();
+    try {
+      final descripcion = await showModalBottomSheet<String>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        builder: (hoja) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            10,
+            20,
+            MediaQuery.viewInsetsOf(hoja).bottom + 24,
+          ),
+          child: SafeArea(
+            top: false,
+            child: Form(
+              key: form,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Solicitar recuperación',
+                    style: Theme.of(hoja).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Cuéntanos cómo demostrarías que "${objeto.nombre}" es tuyo.',
+                    style: Theme.of(hoja).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: prueba,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Prueba de propiedad',
+                      hintText: 'Ej.: tiene una marca particular o contenido identificable',
+                    ),
+                    validator: (texto) => (texto?.trim().length ?? 0) < 12
+                        ? 'Escribe al menos 12 caracteres'
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    onPressed: () {
+                      if (form.currentState!.validate()) {
+                        Navigator.pop(hoja, prueba.text.trim());
+                      }
+                    },
+                    icon: const Icon(Icons.send_outlined),
+                    label: const Text('Enviar solicitud'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      if (!context.mounted || descripcion == null) return;
+      final exito = scope.solicitudes.registrar(
+        objeto: objeto,
+        correo: correo,
+        descripcion: descripcion,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            exito
+                ? 'Solicitud guardada. Revísala en Mis solicitudes.'
+                : 'No fue posible crear la solicitud.',
+          ),
+        ),
+      );
+    } finally {
+      prueba.dispose();
+    }
   }
 
   Widget _dato(
