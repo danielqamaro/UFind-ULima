@@ -3,9 +3,8 @@ import 'package:ufind/app/app_dependencies.dart';
 
 import 'package:ufind/views/alumno/alumno_home.dart';
 import 'package:ufind/views/temporal/proximamente_screen.dart';
+import 'package:ufind/views/alumno/alumno_perfil.dart';
 import 'package:ufind/views/alumno/alumno_solicitudes.dart';
-
-
 import 'package:ufind/views/alumno/lista_objetos.dart';
 import 'package:ufind/viewmodels/publicaciones_viewmodel.dart';
 
@@ -28,7 +27,7 @@ class _AlumnoInicioState extends State<AlumnoInicio> {
       ListaObjetosScreen(viewModel: widget.viewModel, dependencias: widget.dependencias),
       const ProximamenteScreen(titulo: 'Mapa del campus', descripcion: 'Próximamente podrás consultar las ubicaciones del campus.'),
       AlumnoSolicitudes(dependencias: widget.dependencias),
-      const ProximamenteScreen(titulo: 'Mi perfil', descripcion: 'Aquí podrás consultar y editar tu perfil.'),
+      AlumnoPerfil(dependencias: widget.dependencias),
     ];
     return Scaffold(
       body: IndexedStack(index: _indice, children: paginas),
