@@ -309,6 +309,7 @@ class _GestionPublicacionesScreenState
                                             builder: (context) =>
                                                 DetalleObjetoScreen(
                                                   objeto: objeto,
+                                                  permitirReclamo: false,
                                                   dependencias: widget.dependencias,
                                                 ),
                                           ),

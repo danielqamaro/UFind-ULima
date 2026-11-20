@@ -11,7 +11,11 @@ import 'package:ufind/viewmodels/publicaciones_viewmodel.dart';
 class AlumnoInicio extends StatefulWidget {
   final PublicacionesViewModel viewModel;
   final AppDependencies dependencias;
-  const AlumnoInicio({super.key, required this.viewModel, required this.dependencias});
+  const AlumnoInicio({
+    super.key,
+    required this.viewModel,
+    required this.dependencias,
+  });
   @override
   State<AlumnoInicio> createState() => _AlumnoInicioState();
 }
@@ -23,14 +27,50 @@ class _AlumnoInicioState extends State<AlumnoInicio> {
   @override
   Widget build(BuildContext context) {
     final paginas = [
-      AlumnoHome(viewModel: widget.viewModel, cambiarPagina: _irA, dependencias: widget.dependencias),
-      ListaObjetosScreen(viewModel: widget.viewModel, dependencias: widget.dependencias),
-      const ProximamenteScreen(titulo: 'Mapa del campus', descripcion: 'Próximamente podrás consultar las ubicaciones del campus.'),
+      AlumnoHome(
+        viewModel: widget.viewModel,
+        cambiarPagina: _irA,
+        dependencias: widget.dependencias,
+      ),
+      ListaObjetosScreen(
+        viewModel: widget.viewModel,
+        dependencias: widget.dependencias,
+      ),
+      const ProximamenteScreen(
+        titulo: 'Mapa del campus',
+        descripcion:
+            'Próximamente podrás consultar las ubicaciones del campus.',
+      ),
       AlumnoSolicitudes(dependencias: widget.dependencias),
       AlumnoPerfil(dependencias: widget.dependencias),
     ];
     return Scaffold(
-      body: IndexedStack(index: _indice, children: paginas),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          IndexedStack(index: _indice, children: paginas),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 2,
+            child: IgnorePointer(
+              child: Row(
+                children: [
+                  const Spacer(flex: 4),
+                  Expanded(
+                    child: Image.asset(
+                      'gif/ulises-animado.gif',
+                      height: 82,
+                      fit: BoxFit.contain,
+                      excludeFromSemantics: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _indice,
         onDestinationSelected: _irA,

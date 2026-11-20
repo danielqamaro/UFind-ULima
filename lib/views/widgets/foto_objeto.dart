@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 class FotoObjeto extends StatelessWidget {
   final String ruta;
   final double alto;
+  final BoxFit ajuste;
   final IconData reemplazo;
   const FotoObjeto({
     super.key,
     required this.ruta,
     this.alto = 210,
+    this.ajuste = BoxFit.cover,
     this.reemplazo = Icons.inventory_2_rounded,
   });
 
@@ -20,7 +22,7 @@ class FotoObjeto extends StatelessWidget {
     if (ruta.startsWith('file:')) {
       foto = Image.file(
         File(ruta.substring(5)),
-        fit: BoxFit.cover,
+        fit: ajuste,
         width: double.infinity,
         height: alto,
         errorBuilder: (_, _, _) => _fallback(context),
@@ -28,7 +30,7 @@ class FotoObjeto extends StatelessWidget {
     } else if (ruta.trim().isNotEmpty) {
       foto = Image.asset(
         'assets/$ruta',
-        fit: BoxFit.cover,
+        fit: ajuste,
         width: double.infinity,
         height: alto,
         errorBuilder: (_, _, _) => _fallback(context),

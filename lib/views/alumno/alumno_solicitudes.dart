@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:ufind/app/app_dependencies.dart';
 import 'package:ufind/models/solicitud_recuperacion.dart';
 
+import 'notificaciones.dart';
+
 class AlumnoSolicitudes extends StatelessWidget {
   const AlumnoSolicitudes({super.key, required this.dependencias});
   final AppDependencies dependencias;
@@ -17,7 +19,10 @@ class AlumnoSolicitudes extends StatelessWidget {
   Widget build(BuildContext context) {
     final servicios = dependencias;
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis solicitudes')),
+      appBar: AppBar(
+        title: const Text('Mis solicitudes'),
+        actions: [CampanaNotificaciones(dependencias: dependencias)],
+      ),
       body: SafeArea(
         child: ListenableBuilder(
           listenable: servicios.solicitudes,
@@ -44,7 +49,7 @@ class AlumnoSolicitudes extends StatelessWidget {
                       ),
                       const SizedBox(height: 9),
                       Text(
-                        'Abre el detalle de un objeto disponible y selecciona "Solicitar recuperación".',
+                        'Abre el detalle de un objeto disponible y selecciona "Reclamar objeto".',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
@@ -104,6 +109,10 @@ class AlumnoSolicitudes extends StatelessWidget {
               solicitud.descripcion,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
+            if (solicitud.motivoRechazo.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text('Motivo del rechazo: ${solicitud.motivoRechazo}'),
+            ],
             if (solicitud.estado == 'Aprobada') ...[
               const SizedBox(height: 12),
               const Text(

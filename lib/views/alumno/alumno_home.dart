@@ -5,6 +5,7 @@ import 'package:ufind/views/widgets/foto_perfil.dart';
 import 'package:ufind/views/widgets/objeto_card.dart';
 import 'package:ufind/views/widgets/tarjeta_busqueda.dart';
 import 'detalle_objeto.dart';
+import 'notificaciones.dart';
 import 'package:ufind/viewmodels/publicaciones_viewmodel.dart';
 
 class AlumnoHome extends StatelessWidget {
@@ -42,7 +43,8 @@ class AlumnoHome extends StatelessWidget {
                           ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  CampanaNotificaciones(dependencias: dependencias),
+                  const SizedBox(width: 4),
                   Tooltip(
                     message: 'Ir a mi perfil',
                     child: InkWell(
