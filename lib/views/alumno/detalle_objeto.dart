@@ -4,12 +4,21 @@ import 'package:ufind/app/app_dependencies.dart';
 import 'package:ufind/models/objeto_publicacion.dart';
 import 'package:ufind/views/widgets/foto_objeto.dart';
 import 'package:ufind/views/widgets/etiqueta_estado.dart';
+
+import 'formulario_reclamo.dart';
 import 'mapa_detalle.dart';
 
 class DetalleObjetoScreen extends StatelessWidget {
   final ObjetoPublicacion objeto;
   final AppDependencies dependencias;
-  const DetalleObjetoScreen({super.key, required this.objeto, required this.dependencias});
+  final bool permitirReclamo;
+
+  const DetalleObjetoScreen({
+    super.key,
+    required this.objeto,
+    required this.dependencias,
+    this.permitirReclamo = true,
+  });
 
   Future<void> _solicitar(BuildContext context) async {
     final scope = dependencias;
@@ -30,83 +39,21 @@ class DetalleObjetoScreen extends StatelessWidget {
       );
       return;
     }
-    final form = GlobalKey<FormState>();
-    final prueba = TextEditingController();
-    try {
-      final descripcion = await showModalBottomSheet<String>(
-        context: context,
-        isScrollControlled: true,
-        showDragHandle: true,
-        builder: (hoja) => Padding(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            10,
-            20,
-            MediaQuery.viewInsetsOf(hoja).bottom + 24,
-          ),
-          child: SafeArea(
-            top: false,
-            child: Form(
-              key: form,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Solicitar recuperación',
-                    style: Theme.of(hoja).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Cuéntanos cómo demostrarías que "${objeto.nombre}" es tuyo.',
-                    style: Theme.of(hoja).textTheme.bodyLarge,
-                  ),
-                  const SizedBox(height: 14),
-                  TextFormField(
-                    controller: prueba,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: 'Prueba de propiedad',
-                      hintText: 'Ej.: tiene una marca particular o contenido identificable',
-                    ),
-                    validator: (texto) => (texto?.trim().length ?? 0) < 12
-                        ? 'Escribe al menos 12 caracteres'
-                        : null,
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.icon(
-                    onPressed: () {
-                      if (form.currentState!.validate()) {
-                        Navigator.pop(hoja, prueba.text.trim());
-                      }
-                    },
-                    icon: const Icon(Icons.send_outlined),
-                    label: const Text('Enviar solicitud'),
-                  ),
-                ],
-              ),
-            ),
-          ),
+    final enviado = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => FormularioReclamoScreen(
+          objeto: objeto,
+          dependencias: scope,
+          correo: correo,
         ),
-      );
-      if (!context.mounted || descripcion == null) return;
-      final exito = scope.solicitudes.registrar(
-        objeto: objeto,
-        correo: correo,
-        descripcion: descripcion,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            exito
-                ? 'Solicitud guardada. Revísala en Mis solicitudes.'
-                : 'No fue posible crear la solicitud.',
-          ),
-        ),
-      );
-    } finally {
-      prueba.dispose();
-    }
+      ),
+    );
+    if (enviado != true || !context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Reclamo enviado. Puedes seguirlo en Mis solicitudes.'),
+      ),
+    );
   }
 
   Widget _dato(
@@ -221,6 +168,23 @@ class DetalleObjetoScreen extends StatelessWidget {
               label: const Text('Ver ubicación en el mapa'),
             ),
             const SizedBox(height: 12),
+            if (permitirReclamo && objeto.estado == 'Disponible')
+              FilledButton.tonalIcon(
+                onPressed: () => _solicitar(context),
+                icon: const Icon(Icons.assignment_turned_in_outlined),
+                label: const Text('Reclamar objeto'),
+              )
+            else if (permitirReclamo)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Text(
+                    'Este objeto no está disponible para nuevas solicitudes.',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              ),
+            if (permitirReclamo) const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: () => showDialog<void>(
                 context: context,
@@ -240,23 +204,6 @@ class DetalleObjetoScreen extends StatelessWidget {
               icon: const Icon(Icons.mail_outline),
               label: const Text('Contactar a Administración'),
             ),
-            const SizedBox(height: 12),
-            if (objeto.estado == 'Disponible')
-              FilledButton.tonalIcon(
-                onPressed: () => _solicitar(context),
-                icon: const Icon(Icons.assignment_turned_in_outlined),
-                label: const Text('Solicitar recuperación'),
-              )
-            else
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: Text(
-                    'Este objeto no está disponible para nuevas solicitudes.',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-              ),
             const SizedBox(height: 16),
           ],
         ),
